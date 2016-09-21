@@ -1,5 +1,5 @@
 {
-    "name": "php-xpdf/php-xpdf",
+    "name": "ifunk/php-xpdf",
     "type": "library",
     "description": "XPDF PHP, an Object Oriented library to manipulate XPDF",
     "keywords": ["xpdf", "pdf"],
