@@ -22,50 +22,25 @@ use XPDF\Exception\RuntimeException;
 use XPDF\Exception\BinaryNotFoundException;
 
 /**
- * The PdfToText object.
+ * The PdfImages object.
  *
- * This binary adapter is used to extract text from PDF with the PdfToText
+ * This binary adapter is used to extract images from PDF with the PdfImages
  * binary provided by XPDF.
  *
- * @see https://wikipedia.org/wiki/Pdftotext
+ * @see https://wikipedia.org/wiki/Pdfimages
  * @license MIT
  */
-class PdfToText extends AbstractBinary
+class PdfImages extends AbstractBinary
 {
-    private $charset = 'UTF-8';
     private $pages;
-    private $output_mode = '-raw';
+    private $output_format = '';
 
     /**
      * {@inheritdoc}
      */
     public function getName()
     {
-        return 'pdftotext';
-    }
-
-    /**
-     * Sets the output encoding. If the charset is invalid, the getText method
-     * will fail.
-     *
-     * @param  string    $charset The output charset
-     * @return PdfToText
-     */
-    public function setOuputEncoding($charset)
-    {
-        $this->charset = $charset;
-
-        return $this;
-    }
-
-    /**
-     * Gets the ouput encoding, default is UTF-8
-     *
-     * @return string
-     */
-    public function getOuputEncoding()
-    {
-        return $this->charset;
+        return 'pdfimages';
     }
 
     /**
@@ -73,7 +48,7 @@ class PdfToText extends AbstractBinary
      *
      * @param integer $pages
      *
-     * @return PdfToText
+     * @return PdfImages
      */
     public function setPageQuantity($pages)
     {
@@ -87,27 +62,32 @@ class PdfToText extends AbstractBinary
     }
 
     /**
-     * Set the output formatting mode
+     * Set the image output format.
      *
-     * @param string $mode
+     * Normally, all images are written as PBM (for monochrome  images)
+     * or  PPM  (for  non-monochrome  images) files.  This option allows
+     * images in DCT format to be saved  as  JPEG  files.   All  non-DCT
+     * images are saved in PBM/PPM format as usual regardless of format.
+     *  
+     * @param string $format
      * 
-     * @return PdfToText
+     * @return PdfImages
      *
-     * Valid modes are "raw" and "layout"
+     * Valid formats are "jpeg" and "bitmap"
      */
-    public function setOutputMode($mode)
+    public function setOutputFormat($format)
     {
-        switch (strtolower($mode)) {
-            case 'raw':
-            case '-raw':
-                $this->output_mode = '-raw';
+        switch (strtolower($format)) {
+            case 'jpeg':
+            case 'jpg':
+            case '-j':
+                $this->output_format = '-j';
                 break;
-            case 'layout':
-            case '-layout':
-                $this->output_mode = '-layout';
+            case 'bitmap':
+                $this->output_format = '';
                 break;
             default:
-                throw new InvalidArgumentException('Mode must be "raw" or "layout"');
+                throw new InvalidArgumentException('Format must be "jpeg" or "bitmap"');
                 break;
         }
 
@@ -115,19 +95,25 @@ class PdfToText extends AbstractBinary
     }
 
     /**
-     * Extracts the text of the current open PDF file, if not page start/end
-     * provided, extract all pages.
+     * Extracts images from the current open PDF file, if not page start/end
+     * provided, extract from all pages.
+     *
+     * Image files will end in .ppm OR .pbm by default, and placed in the 
+     * system temp directory.
+     * 
+     * To save images as .jpg (where possible), use:
+     *     $pdfImages->setOutputFormat('jpeg');
      *
      * @param string  $pathfile   The path to the PDF file
      * @param integer $page_start The starting page number (first is 1)
      * @param integer $page_end   The ending page number
      *
-     * @return string The extracted text
+     * @return array File paths of the extracted images
      *
      * @throws InvalidArgumentException
      * @throws RuntimeException
      */
-    public function getText($pathfile, $page_start = null, $page_end = null)
+    public function getImages($pathfile, $page_start = null, $page_end = null)
     {
         if ( ! file_exists($pathfile)) {
             throw new InvalidArgumentException(sprintf('%s is not a valid file', $pathfile));
@@ -149,36 +135,35 @@ class PdfToText extends AbstractBinary
 
         $tmpFile = tempnam(sys_get_temp_dir(), 'xpdf');
 
-        $commands[] = $this->output_mode;
-        $commands[] = '-nopgbrk';
-        $commands[] = '-enc';
-        $commands[] = $this->charset;
-        $commands[] = '-eol';
-        $commands[] = '-unix';
+        if ($this->output_format) {
+            $commands[] = $this->output_format;
+        }
         $commands[] = $pathfile;
         $commands[] = $tmpFile;
 
         try {
             $this->command($commands);
-            $ret = file_get_contents($tmpFile);
-
+            
             if (is_writable($tmpFile)) {
                 unlink($tmpFile);
             }
+
+            $ret = glob($tmpFile . '*');
+
         } catch (ExecutionFailureException $e) {
-            throw new RuntimeException('Unable to extract text', $e->getCode(), $e);
+            throw new RuntimeException('Unable to extract images', $e->getCode(), $e);
         }
 
         return $ret;
     }
 
     /**
-     * Factory for PdfToText
+     * Factory for PdfImages
      *
      * @param array|Configuration $configuration
      * @param LoggerInterface     $logger
      *
-     * @return PdfToText
+     * @return PdfImages
      */
     public static function create($configuration = array(), LoggerInterface $logger = null)
     {
@@ -186,7 +171,7 @@ class PdfToText extends AbstractBinary
             $configuration = new Configuration($configuration);
         }
 
-        $binaries = $configuration->get('pdftotext.binaries', 'pdftotext');
+        $binaries = $configuration->get('pdfimages.binaries', 'pdfimages');
 
         if (!$configuration->has('timeout')) {
             $configuration->set('timeout', 60);
@@ -195,7 +180,7 @@ class PdfToText extends AbstractBinary
         try {
             return static::load($binaries, $logger, $configuration);
         } catch (ExecutableNotFoundException $e) {
-            throw new BinaryNotFoundException('Unable to find pdftotext', $e->getCode(), $e);
+            throw new BinaryNotFoundException('Unable to find pdfimages', $e->getCode(), $e);
         }
     }
 }
