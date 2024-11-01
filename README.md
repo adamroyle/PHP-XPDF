@@ -100,29 +100,6 @@ $images = $pdfToPpm->getImages('document.pdf');
 
 This will return an array of filenames in a temp directory.
 
-### Use with Silex
-
-A [Silex](http://silex.sensiolabs.org) service provider is available
-
-```php
-$app = new Silex\Application();
-$app->register(new XPDF\XPDFServiceProvider());
-
-$app['xpdf.pdftotext']->getText('document.pdf');
-```
-
-Options can be passed to customize the provider.
-
-```php
-$app->register(new XPDF\XPDFServiceProvider(), array(
-    'xpdf.configuration' => array(
-        'pdftotext.timeout'  => 30,
-        'pdftotext.binaries' => '/opt/local/xpdf/bin/pdftotext',
-    ),
-    'xpdf.logger' => $logger,
-));
-```
-
 ## License
 
 This project is licensed under the [MIT license](http://opensource.org/licenses/MIT).
