@@ -16,7 +16,7 @@ It is recommended to install PHP-XPDF through [Composer](http://getcomposer.org)
 ```json
 {
   "require": {
-    "ifunk/php-xpdf": "^1.0.0"
+    "adamroyle/php-xpdf": "^1.0.0"
   }
 }
 ```
