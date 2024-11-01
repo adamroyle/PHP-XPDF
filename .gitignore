@@ -1,4 +1,2 @@
-docs/build
-/nbproject
 /vendor
-composer.phar
+.phpunit.cache
