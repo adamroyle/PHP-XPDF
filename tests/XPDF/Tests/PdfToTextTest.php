@@ -2,10 +2,13 @@
 
 namespace XPDF\Tests;
 
+use PHPUnit\Framework\TestCase;
 use XPDF\PdfToText;
 use Symfony\Component\Process\ExecutableFinder;
+use XPDF\Exception\BinaryNotFoundException;
+use XPDF\Exception\InvalidArgumentException;
 
-class PdfToTextTest extends \PHPUnit_Framework_TestCase
+class PdfToTextTest extends TestCase
 {
     public function testSetOutputEncoding()
     {
@@ -16,19 +19,15 @@ class PdfToTextTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('ascii', $pdfToText->getOutputEncoding());
     }
 
-    /**
-     * @expectedException XPDF\Exception\BinaryNotFoundException
-     */
     public function testBinaryNotFound()
     {
+        $this->expectException(BinaryNotFoundException::class);
         PdfToText::create(array('pdftotext.binaries' => '/path/to/nowhere'));
     }
 
-    /**
-     * @expectedException XPDF\Exception\InvalidArgumentException
-     */
     public function testGetTextInvalidFile()
     {
+        $this->expectException(InvalidArgumentException::class);
         $pdfToText = PdfToText::create();
         $pdfToText->getText('/path/to/nowhere');
     }
@@ -62,11 +61,9 @@ It tells about elephant\'s noze !
     //     $pdfToText->getText(__DIR__ . '/../../files/HelloWorld.pdf', 2, 2);
     // }
 
-    /**
-     * @expectedException XPDF\Exception\InvalidArgumentException
-     */
     public function testInvalidPageQuantity()
     {
+        $this->expectException(InvalidArgumentException::class);
         $pdfToText = PdfToText::create();
         $pdfToText->setPageQuantity(0);
     }
@@ -80,7 +77,7 @@ It tells about elephant\'s noze !
             $this->markTestSkipped('Unable to find PHP binary, required for this test');
         }
 
-        $logger = $this->getMock('Psr\Log\LoggerInterface');
+        $logger = $this->createMock('Psr\Log\LoggerInterface');
 
         $pdfToText = PdfToText::create(array('pdftotext.binaries' => $php, 'timeout' => 42), $logger);
         $this->assertInstanceOf('XPDF\PdfToText', $pdfToText);

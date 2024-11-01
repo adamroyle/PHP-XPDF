@@ -11,9 +11,9 @@ It is recommended to install PHP-XPDF through [Composer](http://getcomposer.org)
 
 ```json
 {
-    "require": {
-        "php-xpdf/php-xpdf": "~0.2.0"
-    }
+  "require": {
+    "ifunk/php-xpdf": "~0.2.0"
+  }
 }
 ```
 
@@ -22,7 +22,6 @@ It is recommended to install PHP-XPDF through [Composer](http://getcomposer.org)
 In order to use PHP-XPDF, you need to install XPDF. Depending of your
 configuration, please follow the instructions at on the
 [XPDF website](http://www.foolabs.com/xpdf/download.html).
-
 
 ## Documentation
 

@@ -2,25 +2,23 @@
 
 namespace XPDF\Tests;
 
+use PHPUnit\Framework\TestCase;
 use XPDF\PdfImages;
 use Symfony\Component\Process\ExecutableFinder;
+use XPDF\Exception\BinaryNotFoundException;
+use XPDF\Exception\InvalidArgumentException;
 
-class PdfImagesTest extends \PHPUnit_Framework_TestCase
+class PdfImagesTest extends TestCase
 {
-
-    /**
-     * @expectedException XPDF\Exception\BinaryNotFoundException
-     */
     public function testBinaryNotFound()
     {
+        $this->expectException(BinaryNotFoundException::class);
         PdfImages::create(array('pdfimages.binaries' => '/path/to/nowhere'));
     }
 
-    /**
-     * @expectedException XPDF\Exception\InvalidArgumentException
-     */
     public function testGetImagesInvalidFile()
     {
+        $this->expectException(InvalidArgumentException::class);
         $pdfImages = PdfImages::create();
         $pdfImages->getImages('/path/to/nowhere');
     }
@@ -104,11 +102,9 @@ class PdfImagesTest extends \PHPUnit_Framework_TestCase
 //         $this->assertEquals($text, $pdfToText->getText(__DIR__ . '/../../files/HelloWorld.pdf'));
 //     }
 
-    /**
-     * @expectedException XPDF\Exception\InvalidArgumentException
-     */
     public function testInvalidPageQuantity()
     {
+        $this->expectException(InvalidArgumentException::class);
         $pdfImages = PdfImages::create();
         $pdfImages->setPageQuantity(0);
     }
@@ -122,7 +118,7 @@ class PdfImagesTest extends \PHPUnit_Framework_TestCase
             $this->markTestSkipped('Unable to find PHP binary, required for this test');
         }
 
-        $logger = $this->getMock('Psr\Log\LoggerInterface');
+        $logger = $this->createMock('Psr\Log\LoggerInterface');
 
         $pdfImages = PdfImages::create(array('pdfimages.binaries' => $php, 'timeout' => 42), $logger);
         $this->assertInstanceOf('XPDF\PdfImages', $pdfImages);

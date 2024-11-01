@@ -2,11 +2,12 @@
 
 namespace XPDF\Tests;
 
+use PHPUnit\Framework\TestCase;
 use XPDF\XPDFServiceProvider;
 use Silex\Application;
 use Symfony\Component\Process\ExecutableFinder;
 
-class XPDFServiceProviderTest extends \PHPUnit_Framework_TestCase
+class XPDFServiceProviderTest extends TestCase
 {
     public function testInit()
     {
@@ -17,7 +18,7 @@ class XPDFServiceProviderTest extends \PHPUnit_Framework_TestCase
             $this->markTestSkipped('Unable to find PHP binary, required for this test');
         }
 
-        $logger = $this->getMock('Psr\Log\LoggerInterface');
+        $logger = $this->createMock('Psr\Log\LoggerInterface');
 
         $app = new Application();
         $app->register(new XPDFServiceProvider(), array(
