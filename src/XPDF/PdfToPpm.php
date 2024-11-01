@@ -33,6 +33,8 @@ class PdfToPpm extends AbstractBinary
 {
     private $pages;
     private $output_format = '';
+    private $resolution = 0;
+    private $maxDimension = 0;
 
     /**
      * {@inheritdoc}
@@ -98,6 +100,36 @@ class PdfToPpm extends AbstractBinary
     }
 
     /**
+     * Sets the resolution resolution of the output image, as a DPI value.
+     * Overrides the max dimension setting.
+     *
+     * @param integer $resolution The resolution in DPI
+     * @return PdfToPpm
+     */
+    public function setResolution(int $resolution)
+    {
+        $this->resolution = $resolution;
+        $this->maxDimension = 0;
+
+        return $this;
+    }
+
+    /**
+     * Sets the maximum width or height of the output image, in pixels.
+     * Overrides the resolution setting.
+     *
+     * @param integer $width
+     * @return PdfToPpm
+     */
+    public function setMaxDimension(int $length)
+    {
+        $this->maxDimension = $length;
+        $this->resolution = 0;
+
+        return $this;
+    }
+
+    /**
      * Generates images from the current open PDF file, if not page start/end
      * provided, generate all pages.
      *
@@ -144,6 +176,17 @@ class PdfToPpm extends AbstractBinary
         if ($this->output_format) {
             $commands[] = $this->output_format;
         }
+
+        if ($this->resolution) {
+            $commands[] = '-r';
+            $commands[] = $this->resolution;
+        }
+
+        if ($this->maxDimension) {
+            $commands[] = '-scale-to';
+            $commands[] = $this->maxDimension;
+        }
+
         $commands[] = $pathfile;
         $commands[] = $tmpFile;
 

@@ -71,6 +71,45 @@ class PdfToPpmTest extends TestCase
         $this->removeTempFiles($result);
     }
 
+    public function testGetImagesWithMaxDimension()
+    {
+        $pdfToPpm = PdfToPpm::create();
+        $pdfToPpm->setOutputFormat('png');
+        $pdfToPpm->setMaxDimension(2000);
+
+        $result = $pdfToPpm->getImages(__DIR__ . '/../../files/SearchResults.pdf', 1, 1);
+
+        $this->assertEquals(1, count($result));
+        foreach ($result as $file) {
+            $this->assertEquals(true, file_exists($file));
+            $this->assertEquals(true, preg_match('/\.png$/', $file));
+            list(, $height) = getimagesize($file);
+            $this->assertEquals(2000, $height);
+        }
+
+        $this->removeTempFiles($result);
+    }
+
+    public function testGetImagesWithResolution()
+    {
+        $pdfToPpm = PdfToPpm::create();
+        $pdfToPpm->setOutputFormat('png');
+        $pdfToPpm->setResolution(300);
+
+        $result = $pdfToPpm->getImages(__DIR__ . '/../../files/SearchResults.pdf', 1, 1);
+
+        $this->assertEquals(1, count($result));
+        foreach ($result as $file) {
+            $this->assertEquals(true, file_exists($file));
+            $this->assertEquals(true, preg_match('/\.png$/', $file));
+            list($width, $height) = getimagesize($file);
+            $this->assertEquals(2484, $width);
+            $this->assertEquals(3513, $height);
+        }
+
+        $this->removeTempFiles($result);
+    }
+
     public function testInvalidPageQuantity()
     {
         $this->expectException(InvalidArgumentException::class);
