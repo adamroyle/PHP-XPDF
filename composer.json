@@ -2,7 +2,10 @@
     "name": "ifunk/php-xpdf",
     "type": "library",
     "description": "XPDF PHP, an Object Oriented library to manipulate XPDF",
-    "keywords": ["xpdf", "pdf"],
+    "keywords": [
+        "xpdf",
+        "pdf"
+    ],
     "license": "MIT",
     "authors": [
         {
@@ -17,13 +20,12 @@
         }
     ],
     "require": {
-        "php"                   : ">=5.3.3",
-        "alchemy/binary-driver" : "~1.5"
+        "php": ">=5.3.3",
+        "alchemy/binary-driver": "~1.5"
     },
     "require-dev": {
-        "sami/sami"           : "~1.0",
-        "silex/silex"         : "~1.0",
-        "phpunit/phpunit"     : "~3.7"
+        "silex/silex": "~1.0",
+        "phpunit/phpunit": "~3.7"
     },
     "autoload": {
         "psr-0": {
